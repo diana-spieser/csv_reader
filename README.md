@@ -1,24 +1,26 @@
-# README
+Features
+Add User
+To add a new user, fill in the required fields in the "Create new user" section and click the "Create User" button.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Import CSV
+Click the "Import CSV" section.
+Choose a CSV file using the provided file input.
+Click the "Parse CSV" button to dynamically add users based on the CSV data.
+List of Users
+The list of users is displayed in a table format, showing their first name, last name, and email.
 
-Things you may want to cover:
+Add Multiple Users
+To add multiple users at once, use the "Add User" button to create additional input fields dynamically.
 
-* Ruby version
+Styling
+The application uses a simple and clean design with color variables for easy customization. You can adjust the color scheme by modifying the variables in the :root section of the included style.
 
-* System dependencies
+css
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+:root {
+  --text: #140901;
+  --background: #fff9f5;
+  --primary: #5bb3fb;
+  --secondary: #a5aafd;
+  --accent: #05d1c7;
+}
