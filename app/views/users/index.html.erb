@@ -1,0 +1,199 @@
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<style>
+  /* Color Variables */
+  :root {
+--text: #140901;
+--background: #fff9f5;
+--primary: #5bb3fb;
+--secondary: #a5aafd;
+--accent: #05d1c7
+  }
+
+  /* Style for the table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  /* Style for table headers */
+  thead {
+    background-color: var(--secondary);
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--accent);
+  }
+
+  /* Style for alternating row colors */
+  tbody tr:nth-child(even) {
+    background-color: var(--background);
+  }
+
+  /* Style for the user fields container */
+  .user-fields {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+  }
+
+  /* Style for the form labels */
+  .user-fields label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--primary);
+  }
+
+  /* Style for the input fields */
+  .user-fields input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Style for the "Add User" button */
+  #add-user {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    font-size: 16px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  /* Style for the "Parse CSV" button */
+  #parse-csv {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    font-size: 16px;
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+    /* Style for the "Create User" button */
+  #create-user-submit {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    font-size: 16px;
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+</style>
+
+
+<h1>List of Users</h1>
+<table>
+<thead>
+<tr>
+  <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+</tr>
+</thead>
+<tbody>
+<%@users.each do |user|%>
+<tr>
+<td><%= user.first_name %></td>
+<td><%= user.last_name%></td>
+<td><%= user.email %></td>
+</tr>
+<%end%>
+</tbody>
+</table>
+<h2>Create new user</h2>
+
+<%= form_for User.new, url: users_path, html: { id: 'create-form' } do |form| %>
+  <div class="user-fields">
+  <div>
+    <%= form.label :first_name, 'First Name' %>
+
+    <%= form.text_field  :first_name, placeholder: 'Enter First Name' %>
+  </div>
+
+  <div>
+    <%= form.label :last_name, 'Last Name' %>
+    <%= form.text_field :last_name, placeholder: 'Enter Last Name' %>
+  </div>
+
+  <div>
+    <%= form.label :email, 'Email' %>
+    <%= form.email_field :email, placeholder: 'Enter Email' %>
+  </div>
+
+    </div>
+
+  <%= form.submit 'Create User', id: 'create-user-submit' %>
+
+<% end %>
+<button type="button" id="add-user">Add User</button>
+
+<h2>Import CSV</h2>
+<input type="file" id="csv-file" accept="csv">
+<button type="button" id="parse-csv">Parse CSV</button>
+
+
+<script>
+  $(document).ready(function() {
+    // Add User button logic
+    $('#add-user').click(function() {
+      var userFields = $('.user-fields:first').clone();
+      userFields.find('input').val('');
+      $('#create-form').append(userFields);
+    });
+
+    // Parse CSV button logic
+    $('#parse-csv').click(function() {
+      var fileInput = document.getElementById('csv-file');
+      var file = fileInput.files[0];
+
+      if (file) {
+        Papa.parse(file, {
+          header: true,
+          dynamicTyping: true,
+          complete: function(results) {
+            if (results.data.length > 0) {
+              // Fill the first set of user fields with data from the first row
+              fillUserFields($('.user-fields:first'), results.data[0]);
+
+              // Add additional sets for the remaining rows
+              for (var i = 1; i < results.data.length; i++) {
+                addUser(results.data[i]);
+              }
+            } else {
+              alert('CSV file is empty');
+            }
+          }
+        });
+      } else {
+        alert('Please select a CSV file');
+      }
+    });
+
+    // Function to fill user fields with data
+    function fillUserFields(userFields, userData) {
+      userFields.find('input[name="user[first_name]"]').val(userData['First Name']);
+      userFields.find('input[name="user[last_name]"]').val(userData['Last Name']);
+      userFields.find('input[name="user[email]"]').val(userData['Email']);
+    }
+
+    // Function to add user dynamically
+    function addUser(userData) {
+      var userFields = $('.user-fields:first').clone();
+      fillUserFields(userFields, userData);
+      $('#create-form').append(userFields);
+    }
+  });
+</script>
